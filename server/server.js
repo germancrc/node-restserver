@@ -2,7 +2,7 @@ require('./config/config');
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
-var cors = require('cors');
+const cors = require('cors');
 
 app.use(cors());
 
@@ -15,17 +15,14 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 
-// Importacion archivo usuario.js
-app.use(require('./routes/usuario'));
+// Configiracion de rutas ver index.js
+app.use(require('./routes/index'));
 
 
- 
 // para conectar la base de datos a node
 mongoose.connect(process.env.URLDB, 
             { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true },
             ( err, res ) => {
-
-
 
   if ( err ) throw err;
 

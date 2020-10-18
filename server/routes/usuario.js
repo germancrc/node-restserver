@@ -2,22 +2,22 @@ const express = require('express');
 const bcrypt = require('bcrypt');  //bcrypt sirve para encriptar la contraseña
 const _ = require('underscore'); //libreria para filtar los campos que queremos actualizar y bloquear los que no.
 const Usuario =  require('../models/usuario');
+const { verificaToken, verificaAdmin_Role} = require('../middlewares/autenticacion');
 const app = express();
 
 
-
 // Peticiones HTTP
-app.get('/usuario', function (req, res) { // Obtener usuarios de la DB
+app.get('/usuario', verificaToken,  (req, res) => { 
 
-    let desde = req.query.desde || 0; // Para hacer busqyedas por parametros. Para filtar
+    let desde = req.query.desde || 0; // Para hacer busquedas por parametros. Para filtar
     desde = Number(desde);
 
-    let porPagina = req.query.porPagina || 5; // Para hacer busqyedas por parametros. Para filtar
-    porPagina = Number(porPagina);
+    let limit = req.query.limit || 5; // Para hacer busquedas por parametros. Para filtar
+    limit = Number(limit);
 
-    Usuario.find( {}, 'nombre email role estado google img' ) // Para hacer busqyedas por parametros. Para filtar los datos a mostrar poner entre apostrofes como string
+    Usuario.find( {estado: true}, 'nombre email role estado google img' ) // Para hacer busqyedas por parametros. Para filtar los datos a mostrar poner entre apostrofes como string
     .skip(desde)
-    .limit(porPagina)
+    .limit(limit)
     .exec( (err, usuarios) => {
         if ( err ) {
             return res.status(400).json({
@@ -26,7 +26,7 @@ app.get('/usuario', function (req, res) { // Obtener usuarios de la DB
                 });
             };
 
-            Usuario.count( {}, ( err, conteo) => { // Para agregar el total de registros de la DB
+            Usuario.countDocuments( {estado: true}, ( err, conteo) => { // Para agregar el total de registros de la DB
 
                 res.json({
                     ok: true,
@@ -35,11 +35,11 @@ app.get('/usuario', function (req, res) { // Obtener usuarios de la DB
                 });
 
             });
-    })
+    });
 });
 
 // Para agregar usuarios a la DB
-app.post('/usuario', function (req, res) {
+app.post('/usuario', [verificaToken, verificaAdmin_Role], function (req, res) { // verificaToken,
     let body = req.body;
 
     let usuario = new Usuario({
@@ -65,7 +65,7 @@ app.post('/usuario', function (req, res) {
 });
 
 // Para modicicar/actualizar datos de usuarios en la DB
-app.put('/usuario/:id', function (req, res) {
+app.put('/usuario/:id', [verificaToken, verificaAdmin_Role], function (req, res) { // verificaToken,
 
     let id = req.params.id;
     let body = _.pick( req.body, ['nombre', 'email', 'img', 'role', 'estado'] );
@@ -81,16 +81,17 @@ app.put('/usuario/:id', function (req, res) {
 
          res.json({
             ok: true,
-            usuario: usuarioDB
+            usuario: usuarioDB,
+            message: 'Usuario actualizado'
         });
     });
 });
 
-app.delete('/usuario/:id', function (req, res) {
+app.delete('/usuario/:id', [verificaToken, verificaAdmin_Role], function (req, res) { // verificaToken, 
 
-    let id = req.params.id; // obtener el id del registro a eliminar
+    let id = req.params.id; // obtener el id del registro a eliminar o desactivar
 
-    let cambiaEstado = {
+    let cambiaEstado = { // para desactivar el registro
         estado: false
     }
 
@@ -100,7 +101,9 @@ app.delete('/usuario/:id', function (req, res) {
         if ( err ) {
             return res.status(400).json({
                  ok: false,
-                 err
+                 err: {
+                    message: 'Usuario no existe'
+                 }
              });
          };
 
@@ -115,8 +118,7 @@ app.delete('/usuario/:id', function (req, res) {
 
          res.json({
              ok: true,
-             usuario: usuarioBorrado
-
+             usuario: usuarioBorrado,
          });
 
     });
