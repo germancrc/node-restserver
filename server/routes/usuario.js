@@ -39,7 +39,7 @@ app.get('/usuario', verificaToken,  (req, res) => {
 });
 
 // Para agregar usuarios a la DB
-app.post('/usuario', function (req, res) { // [verificaToken, verificaAdmin_Role]
+app.post('/usuario', [verificaToken, verificaAdmin_Role], function (req, res) { // verificaToken,
     let body = req.body;
 
     let usuario = new Usuario({
@@ -65,7 +65,7 @@ app.post('/usuario', function (req, res) { // [verificaToken, verificaAdmin_Role
 });
 
 // Para modicicar/actualizar datos de usuarios en la DB
-app.put('/usuario/:id', [verificaToken], function (req, res) { // [verificaToken, verificaAdmin_Role]
+app.put('/usuario/:id', [verificaToken, verificaAdmin_Role], function (req, res) { // verificaToken,
 
     let id = req.params.id;
     let body = _.pick( req.body, ['nombre', 'email', 'img', 'role', 'estado'] );
@@ -87,7 +87,7 @@ app.put('/usuario/:id', [verificaToken], function (req, res) { // [verificaToken
     });
 });
 
-app.delete('/usuario/:id', [verificaToken], function (req, res) { // [verificaToken, verificaAdmin_Role]
+app.delete('/usuario/:id', [verificaToken, verificaAdmin_Role], function (req, res) { // verificaToken, 
 
     let id = req.params.id; // obtener el id del registro a eliminar o desactivar
 
