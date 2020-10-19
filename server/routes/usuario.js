@@ -39,7 +39,7 @@ app.get('/usuario', verificaToken,  (req, res) => {
 });
 
 // Para agregar usuarios a la DB
-app.post('/usuario', [verificaToken], function (req, res) { // [verificaToken, verificaAdmin_Role]
+app.post('/usuario', function (req, res) { // [verificaToken, verificaAdmin_Role]
     let body = req.body;
 
     let usuario = new Usuario({
