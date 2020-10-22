@@ -1,0 +1,5 @@
+/*
+ruta: buscar/empleado/:busqueda
+
+*/
+

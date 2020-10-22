@@ -1,6 +1,7 @@
 
 const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
+const { object } = require('underscore');
 
 let rolesValidos = {
     values: ['ADMIN', 'USER'],
@@ -9,10 +10,14 @@ let rolesValidos = {
 
 let Schema = mongoose.Schema;
 
-let usuarioSchema = new Schema({
+let empleadoSchema = new Schema({
     nombre: {
         type: String,
         required: [true, 'El nombre es necesario']
+    },
+    apellido: {
+        type: String,
+        required: [true, 'El apellido es necesario']
     },
     email: {
         type: String,
@@ -29,21 +34,23 @@ let usuarioSchema = new Schema({
     },
     role: {
         type: String,
-        default: 'USER_ROLE',
+        default: 'USER',
         enum: rolesValidos,
     },
-    estado: {
+    activo: {
         type: Boolean,
-        default: true
+        default: true,
+        required: false
     },
     google: {
         type: Boolean,
-        default: false
+        default: false,
+        required: false
     } 
 });
 
 // Para no retornar datos de la contraseña al usuario.
-usuarioSchema.methods.toJSON =  function() {
+empleadoSchema.methods.toJSON =  function() {
     let user = this;
     let userObject = user.toObject();
     delete userObject.password;
@@ -52,7 +59,7 @@ usuarioSchema.methods.toJSON =  function() {
 
 }
 
-usuarioSchema.plugin( uniqueValidator , { message: '{PATH} ya está en uso' })
+empleadoSchema.plugin( uniqueValidator , { message: '{PATH} ya está en uso' })
 
-module.exports = mongoose.model('Usuario', usuarioSchema);
+module.exports = mongoose.model('Empleado', empleadoSchema);
 
