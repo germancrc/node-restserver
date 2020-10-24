@@ -28,24 +28,22 @@ let empleadoSchema = new Schema({
         type: String,
         required: [true, 'El password es necesario']
     },
+    role: {
+        type: String,
+        default: 'USER',
+        enum: rolesValidos
+    },
     img: {
         type: String,
         required: false
     },
-    role: {
-        type: String,
-        default: 'USER',
-        enum: rolesValidos,
-    },
-    activo: {
+    estado: {
         type: Boolean,
-        default: true,
-        required: false
+        default: true
     },
     google: {
         type: Boolean,
-        default: false,
-        required: false
+        default: false
     } 
 });
 

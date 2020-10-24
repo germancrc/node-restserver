@@ -2,17 +2,41 @@
 const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
 
-let rolesValidos = {
-    values: ['ADMIN', 'USER'],
-    message: '{VALUE} no es un rol valido'
-};
-
 let Schema = mongoose.Schema;
 
 let usuarioSchema = new Schema({
     nombre: {
         type: String,
         required: [true, 'El nombre es necesario']
+    },
+    apellido: {
+        type: String,
+        required: [true, 'El apellido es necesario']
+    },
+    cedula: {
+        type: String,
+        unique: true,
+        required: [true, 'La cedula es necesaria']
+    },
+    direccion: {
+        type: String,
+        required: [true, 'Debe escribir su direccion']
+    },
+    numero: {
+        type: String,
+        required: [true, 'Falta numero de la casa / apto']
+    },
+    sector: {
+        type: String,
+        required: [true, 'Falta el sector']
+    },
+    provincia: {
+        type: String,
+        required: [true, 'Provincia']
+    },
+    telefono: {
+        type: String,
+        required: [true, 'El apellido es necesario']
     },
     email: {
         type: String,
@@ -27,18 +51,15 @@ let usuarioSchema = new Schema({
         type: String,
         required: false
     },
-    role: {
-        type: String,
-        default: 'USER_ROLE',
-        enum: rolesValidos,
-    },
-    estado: {
+    activo: {
         type: Boolean,
-        default: true
+        default: true,
+        required: false
     },
     google: {
         type: Boolean,
-        default: false
+        default: false,
+        required: false
     } 
 });
 

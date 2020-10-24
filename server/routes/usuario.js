@@ -15,10 +15,10 @@ app.get('/usuario', verificaToken,  (req, res) => {
     let limit = req.query.limit || 5; // Para hacer busquedas por parametros. Para filtar
     limit = Number(limit);
 
-    Usuario.find( {estado: true}, 'nombre email role estado google img' ) // Para hacer busqyedas por parametros. Para filtar los datos a mostrar poner entre apostrofes como string
+    Usuario.find( {activo: true}, 'nombre apellido cedula direccion numero sector provincia telefono email img google activo' ) // Para hacer busqyedas por parametros. Para filtar los datos a mostrar poner entre apostrofes como string
     .skip(desde)
     .limit(limit)
-    .exec( (err, usuarios) => {
+    .exec( (err, solicitantes) => {
         if ( err ) {
             return res.status(400).json({
                     ok: false,
@@ -26,11 +26,11 @@ app.get('/usuario', verificaToken,  (req, res) => {
                 });
             };
 
-            Usuario.countDocuments( {estado: true}, ( err, conteo) => { // Para agregar el total de registros de la DB
+            Usuario.countDocuments( {activo: true}, ( err, conteo) => { // Para agregar el total de registros de la DB
 
                 res.json({
                     ok: true,
-                    usuarios,
+                    solicitantes,
                     registros: conteo
                 });
 
@@ -38,15 +38,25 @@ app.get('/usuario', verificaToken,  (req, res) => {
     });
 });
 
+
 // Para agregar usuarios a la DB
-app.post('/usuario', [verificaToken, verificaAdmin_Role], function (req, res) { // verificaToken,
+app.post('/usuario', verificaToken, function (req, res) { // verificaToken,
     let body = req.body;
 
     let usuario = new Usuario({
         nombre: body.nombre,
+        apellido: body.apellido,
+        cedula: body.cedula,
+        direccion: body.direccion,
+        numero: body.numero,
+        sector: body.sector,
+        provincia: body.provincia,
+        telefono: body.telefono,
         email: body.email,
         password: bcrypt.hashSync(body.password, 10),
-        role: body.role,
+        img: body.img,
+        google: body.google,
+        activo: body.activo,
     });
 
     usuario.save((err, usuarioDB) => {
@@ -65,10 +75,11 @@ app.post('/usuario', [verificaToken, verificaAdmin_Role], function (req, res) { 
 });
 
 // Para modicicar/actualizar datos de usuarios en la DB
-app.put('/usuario/:id', [verificaToken, verificaAdmin_Role], function (req, res) { // verificaToken,
+app.put('/usuario/:id', verificaToken, function (req, res) { // verificaToken,
 
     let id = req.params.id;
-    let body = _.pick( req.body, ['nombre', 'email', 'img', 'role', 'estado'] );
+    let body = _.pick( req.body, ['nombre', 'apellido', 'cedula', 'direccion',
+    'numero', 'sector', 'provincia', 'telefono', 'email', 'img', 'estado'] );
 
     Usuario.findByIdAndUpdate( id, body, {new: true, runValidators: true}, (err, usuarioDB) => {
 
@@ -87,7 +98,7 @@ app.put('/usuario/:id', [verificaToken, verificaAdmin_Role], function (req, res)
     });
 });
 
-app.delete('/usuario/:id', [verificaToken, verificaAdmin_Role], function (req, res) { // verificaToken, 
+app.delete('/usuario/:id', verificaToken, function (req, res) { // verificaToken, 
 
     let id = req.params.id; // obtener el id del registro a eliminar o desactivar
 
@@ -122,9 +133,6 @@ app.delete('/usuario/:id', [verificaToken, verificaAdmin_Role], function (req, r
          });
 
     });
-
-
-
 
 });
 

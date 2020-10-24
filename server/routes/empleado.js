@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');  //bcrypt sirve para encriptar la contraseña
 const _ = require('underscore'); //libreria para filtar los campos que queremos actualizar y bloquear los que no.
 const Empleado =  require('../models/empleado');
 const { verificaToken, verificaAdmin_Role} = require('../middlewares/autenticacionEmp');
+const empleado = require('../models/empleado');
 const app = express();
 
 
@@ -12,10 +13,10 @@ app.get('/empleado', verificaToken, (req, res) => {  //
     let desde = req.query.desde || 0; // Para hacer busquedas por parametros. Para filtar
     desde = Number(desde);
 
-    let limit = req.query.limit || 10; // Para hacer busquedas por parametros. Para filtar
+    let limit = req.query.limit || 50; // Para hacer busquedas por parametros. Para filtar
     limit = Number(limit);
 
-    Empleado.find( {activo: true}, 'nombre apellido email role estado google img' ) // Para hacer busqyedas por parametros. Para filtar los datos a mostrar poner entre apostrofes como string
+    Empleado.find( {activo: true}, 'nombre apellido email role estado img' ) // Para hacer busqyedas por parametros. Para filtar los datos a mostrar poner entre apostrofes como string
     .skip(desde)
     .limit(limit)
     .exec( (err, usuarios) => {
@@ -35,6 +36,35 @@ app.get('/empleado', verificaToken, (req, res) => {  //
                 });
 
             });
+    });
+});
+
+app.get('/empleado/:id', [verificaToken, verificaAdmin_Role], function (req, res) { // [verificaToken, verificaAdmin_Role],
+
+    let id = req.params.id;
+
+    Empleado.findById( id, (err, empleadoDB) => {
+
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                err
+            });
+        }
+
+        if (!empleadoDB) {
+            return res.status(400).json({
+                ok: false,
+                err: {
+                    message: 'ID no existe'
+                }
+            });
+        }
+
+        res.json({
+            ok: true,
+            empleado: empleadoDB
+        });
     });
 });
 
@@ -69,7 +99,7 @@ app.post('/empleado', [verificaToken, verificaAdmin_Role], function (req, res) {
 app.put('/empleado/:id', [verificaToken, verificaAdmin_Role], function (req, res) { // [verificaToken, verificaAdmin_Role],
 
     let id = req.params.id;
-    let body = _.pick( req.body, ['nombre', 'email', 'img', 'role', 'estado'] );
+    let body = _.pick( req.body, ['nombre', 'apellido', 'email', 'img', 'role', 'estado'] );
 
     Empleado.findByIdAndUpdate( id, body, {new: true, runValidators: true}, (err, empleadoDB) => {
 
