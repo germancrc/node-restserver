@@ -17,7 +17,7 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.10.9",
     "mongoose-unique-validator": "^2.0.3",
-    "nodemon": "^2.0.5",
+    "nodemon": "^2.0.6",
     "npm-git-install": "^0.3.0",
     "underscore": "^1.11.0"
   }

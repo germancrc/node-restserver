@@ -38,9 +38,40 @@ app.get('/usuario', verificaToken,  (req, res) => {
     });
 });
 
+app.get('/usuario/:id', (req, res) => {
+    // populate: usuario categoria
+    // paginado
+    let id = req.params.id;
+
+    Usuario.findById(id, (err, usuarioDB) => {
+
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    err
+                });
+            }
+
+            if (!usuarioDB) {
+                return res.status(400).json({
+                    ok: false,
+                    err: {
+                        message: 'ID no existe'
+                    }
+                });
+            }
+
+            res.json({
+                ok: true,
+                usuario: usuarioDB
+            });
+
+        });
+
+});
 
 // Para agregar usuarios a la DB
-app.post('/usuario', verificaToken, function (req, res) { // verificaToken,
+app.post('/usuario',  function (req, res) { // verificaToken,
     let body = req.body;
 
     let usuario = new Usuario({

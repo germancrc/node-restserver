@@ -37,14 +37,14 @@ let empleadoSchema = new Schema({
         type: String,
         required: false
     },
-    estado: {
+    activo: {
         type: Boolean,
         default: true
     },
     google: {
         type: Boolean,
         default: false
-    } 
+    },
 });
 
 // Para no retornar datos de la contraseña al usuario.

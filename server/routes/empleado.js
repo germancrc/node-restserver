@@ -16,7 +16,7 @@ app.get('/empleado', verificaToken, (req, res) => {  //
     let limit = req.query.limit || 50; // Para hacer busquedas por parametros. Para filtar
     limit = Number(limit);
 
-    Empleado.find( {activo: true}, 'nombre apellido email role estado img' ) // Para hacer busqyedas por parametros. Para filtar los datos a mostrar poner entre apostrofes como string
+    Empleado.find( {activo: true}, 'nombre apellido email role activo img' ) // Para hacer busqyedas por parametros. Para filtar los datos a mostrar poner entre apostrofes como string
     .skip(desde)
     .limit(limit)
     .exec( (err, usuarios) => {
