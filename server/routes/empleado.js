@@ -3,7 +3,6 @@ const bcrypt = require('bcrypt');  //bcrypt sirve para encriptar la contraseña
 const _ = require('underscore'); //libreria para filtar los campos que queremos actualizar y bloquear los que no.
 const Empleado =  require('../models/empleado');
 const { verificaToken, verificaAdmin_Role} = require('../middlewares/autenticacionEmp');
-const empleado = require('../models/empleado');
 const app = express();
 
 
@@ -39,33 +38,64 @@ app.get('/empleado', verificaToken, (req, res) => {  //
     });
 });
 
-app.get('/empleado/:id', [verificaToken, verificaAdmin_Role], function (req, res) { // [verificaToken, verificaAdmin_Role],
-
+app.get('/empleado/:id', (req, res) => {
+    // populate: usuario categoria
+    // paginado
     let id = req.params.id;
 
-    Empleado.findById( id, (err, empleadoDB) => {
+    Empleado.findById(id, (err, empleadoDB) => {
 
-        if (err) {
-            return res.status(500).json({
-                ok: false,
-                err
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    err
+                });
+            }
+
+            if (!empleadoDB) {
+                return res.status(400).json({
+                    ok: false,
+                    err: {
+                        message: 'ID no existe'
+                    }
+                });
+            }
+
+            res.json({
+                ok: true,
+                usuario: empleadoDB
             });
-        }
 
-        if (!empleadoDB) {
-            return res.status(400).json({
-                ok: false,
-                err: {
-                    message: 'ID no existe'
-                }
-            });
-        }
-
-        res.json({
-            ok: true,
-            empleado: empleadoDB
         });
-    });
+
+});
+
+app.get('/empleado/buscar/:termino', verificaToken, (req, res) => {
+
+    let termino = req.params.termino;
+
+    let regex = new RegExp(termino, 'i');
+
+    Empleado.find({ nombre: regex })
+        .populate('servicio', 'nombre')
+        .exec((err, usuarios) => {
+
+
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    err
+                });
+            }
+
+            res.json({
+                ok: true,
+                usuarios
+            })
+
+        })
+
+
 });
 
 // Para agregar usuarios a la DB

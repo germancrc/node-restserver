@@ -12,12 +12,13 @@ app.get('/usuario', verificaToken,  (req, res) => {
     let desde = req.query.desde || 0; // Para hacer busquedas por parametros. Para filtar
     desde = Number(desde);
 
-    let limit = req.query.limit || 5; // Para hacer busquedas por parametros. Para filtar
+    let limit = req.query.limit || 50; // Para hacer busquedas por parametros. Para filtar
     limit = Number(limit);
 
-    Usuario.find( {activo: true}, 'nombre apellido cedula direccion numero sector provincia telefono email img google activo' ) // Para hacer busqyedas por parametros. Para filtar los datos a mostrar poner entre apostrofes como string
+    Usuario.find( {activo: true}, 'nombre apellido cedula direccion numero sector provincia telefono email servicio img google activo' ) // Para hacer busqyedas por parametros. Para filtar los datos a mostrar poner entre apostrofes como string
     .skip(desde)
     .limit(limit)
+    .populate('servicio', 'nombre')
     .exec( (err, solicitantes) => {
         if ( err ) {
             return res.status(400).json({
@@ -70,6 +71,34 @@ app.get('/usuario/:id', (req, res) => {
 
 });
 
+app.get('/usuario/buscar/:termino', verificaToken, (req, res) => {
+
+    let termino = req.params.termino;
+
+    let regex = new RegExp(termino, 'i');
+
+    Usuario.find({ nombre: regex })
+        .populate('servicio', 'nombre')
+        .exec((err, solicitantes) => {
+
+
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    err
+                });
+            }
+
+            res.json({
+                ok: true,
+                solicitantes
+            })
+
+        })
+
+
+});
+
 // Para agregar usuarios a la DB
 app.post('/usuario',  function (req, res) { // verificaToken,
     let body = req.body;
@@ -88,6 +117,7 @@ app.post('/usuario',  function (req, res) { // verificaToken,
         img: body.img,
         google: body.google,
         activo: body.activo,
+        servicio: body.servicio
     });
 
     usuario.save((err, usuarioDB) => {
@@ -110,7 +140,7 @@ app.put('/usuario/:id', verificaToken, function (req, res) { // verificaToken,
 
     let id = req.params.id;
     let body = _.pick( req.body, ['nombre', 'apellido', 'cedula', 'direccion',
-    'numero', 'sector', 'provincia', 'telefono', 'email', 'img', 'estado'] );
+    'numero', 'sector', 'provincia', 'telefono', 'email', 'img', 'estado', 'servicio'] );
 
     Usuario.findByIdAndUpdate( id, body, {new: true, runValidators: true}, (err, usuarioDB) => {
 

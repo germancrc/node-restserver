@@ -60,6 +60,10 @@ let usuarioSchema = new Schema({
         type: Boolean,
         default: false,
         required: false
+    },
+    servicio: {
+        type: String,
+        required: false
     } 
 });
 

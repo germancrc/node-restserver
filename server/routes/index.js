@@ -4,7 +4,7 @@ const app = express();
 // rutas usuario
 app.use(require('./usuario'));
 app.use(require('./login'));
-app.use(require('./categoria'));
+app.use(require('./servicio'));
 // app.use(require('./producto'));
 
 // rutas empleados

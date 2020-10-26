@@ -1,20 +1,20 @@
 const express = require('express');
 
-let { verificaToken, verificaAdmin_Role } = require('../middlewares/autenticacion');
+let { verificaToken, verificaAdmin_Role } = require('../middlewares/autenticacionEmp');
 
 let app = express();
 
-let Categoria = require('../models/categoria');
+let Servicio = require('../models/servicio');
 
 // ============================
-// Mostrar todas las categorias
+// Mostrar todos los servicios
 // ============================
-app.get('/categoria', verificaToken, (req, res) => {
+app.get('/servicio', verificaToken, (req, res) => {
 
-    Categoria.find({})
-        .sort('descripcion')
+    Servicio.find({})
+        .sort('nombre')
         .populate('usuario', 'nombre email')
-        .exec((err, categorias) => {
+        .exec((err, servicios) => {
 
             if (err) {
                 return res.status(500).json({
@@ -25,21 +25,20 @@ app.get('/categoria', verificaToken, (req, res) => {
 
             res.json({
                 ok: true,
-                categorias
+                servicios
             });
 
         })
 });
 
 // ============================
-// Mostrar una categoria por ID
+// Mostrar un servicio por ID
 // ============================
-app.get('/categoria/:id', verificaToken, (req, res) => {
-    // Categoria.findById(....);
+app.get('/servicio/:id', verificaToken, (req, res) => {
 
     let id = req.params.id;
 
-    Categoria.findById(id, (err, categoriaDB) => {
+    Servicio.findById(id, (err, servicioDB) => {
 
         if (err) {
             return res.status(500).json({
@@ -48,8 +47,8 @@ app.get('/categoria/:id', verificaToken, (req, res) => {
             });
         }
 
-        if (!categoriaDB) {
-            return res.status(500).json({
+        if (!servicioDB) {
+            return res.status(400).json({
                 ok: false,
                 err: {
                     message: 'El ID no es correcto'
@@ -60,7 +59,7 @@ app.get('/categoria/:id', verificaToken, (req, res) => {
 
         res.json({
             ok: true,
-            categoria: categoriaDB
+            servicio: servicioDB
         });
 
     });
@@ -69,20 +68,18 @@ app.get('/categoria/:id', verificaToken, (req, res) => {
 });
 
 // ============================
-// Crear nueva categoria
+// Crear nuevo servicio
 // ============================
-app.post('/categoria', verificaToken, (req, res) => {
-    // regresa la nueva categoria
-    // req.usuario._id
+app.post('/servicio', verificaToken, (req, res) => {
     let body = req.body;
 
-    let categoria = new Categoria({
-        descripcion: body.descripcion,
+    let servicio = new Servicio({
+        nombre: body.nombre,
         usuario: req.usuario._id
     });
 
 
-    categoria.save((err, categoriaDB) => {
+    servicio.save((err, servicioDB) => {
 
         if (err) {
             return res.status(500).json({
@@ -91,7 +88,7 @@ app.post('/categoria', verificaToken, (req, res) => {
             });
         }
 
-        if (!categoriaDB) {
+        if (!servicioDB) {
             return res.status(400).json({
                 ok: false,
                 err
@@ -100,7 +97,7 @@ app.post('/categoria', verificaToken, (req, res) => {
 
         res.json({
             ok: true,
-            categoria: categoriaDB
+            servicio: servicioDB
         });
 
 
@@ -110,18 +107,18 @@ app.post('/categoria', verificaToken, (req, res) => {
 });
 
 // ============================
-// Mostrar todas las categorias
+// Editar servicio
 // ============================
-app.put('/categoria/:id', verificaToken, (req, res) => {
+app.put('/servicio/:id', verificaToken, (req, res) => {
 
     let id = req.params.id;
     let body = req.body;
 
-    let descCategoria = {
-        descripcion: body.descripcion
+    let descServicio = {
+        nombre: body.nombre
     };
 
-    Categoria.findByIdAndUpdate(id, descCategoria, { new: true, runValidators: true }, (err, categoriaDB) => {
+    Servicio.findByIdAndUpdate(id, descServicio, { new: true, runValidators: true }, (err, servicioDB) => {
 
         if (err) {
             return res.status(500).json({
@@ -130,7 +127,7 @@ app.put('/categoria/:id', verificaToken, (req, res) => {
             });
         }
 
-        if (!categoriaDB) {
+        if (!servicioDB) {
             return res.status(400).json({
                 ok: false,
                 err
@@ -139,7 +136,7 @@ app.put('/categoria/:id', verificaToken, (req, res) => {
 
         res.json({
             ok: true,
-            categoria: categoriaDB
+            servicio: servicioDB
         });
 
     });
@@ -148,14 +145,13 @@ app.put('/categoria/:id', verificaToken, (req, res) => {
 });
 
 // ============================
-// Mostrar todas las categorias
+// Eliminar servicio
 // ============================
-app.delete('/categoria/:id', [verificaToken, verificaAdmin_Role], (req, res) => {
-    // solo un administrador puede borrar categorias
-    // Categoria.findByIdAndRemove
+app.delete('/servicio/:id', [verificaToken, verificaAdmin_Role], (req, res) => {
+
     let id = req.params.id;
 
-    Categoria.findByIdAndRemove(id, (err, categoriaDB) => {
+    Servicio.findByIdAndRemove(id, (err, servicioDB) => {
 
         if (err) {
             return res.status(500).json({
@@ -164,7 +160,7 @@ app.delete('/categoria/:id', [verificaToken, verificaAdmin_Role], (req, res) => 
             });
         }
 
-        if (!categoriaDB) {
+        if (!servicioDB) {
             return res.status(400).json({
                 ok: false,
                 err: {
@@ -175,7 +171,7 @@ app.delete('/categoria/:id', [verificaToken, verificaAdmin_Role], (req, res) => 
 
         res.json({
             ok: true,
-            message: 'Categoria Borrada'
+            message: 'Servicio borrado'
         });
 
     });
