@@ -61,10 +61,14 @@ let usuarioSchema = new Schema({
         default: false,
         required: false
     },
-    servicio: {
-        type: String,
-        required: false
-    } 
+    servicio: { 
+        type: Schema.Types.ObjectId, 
+        ref: 'servicio' 
+    },
+    timestamps: { 
+        createdAt: '',
+        updatedAt: '' 
+    }
 });
 
 // Para no retornar datos de la contraseña al usuario.

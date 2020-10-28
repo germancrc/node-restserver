@@ -12,8 +12,8 @@ let Servicio = require('../models/servicio');
 app.get('/servicio', verificaToken, (req, res) => {
 
     Servicio.find({})
-        .sort('nombre')
-        .populate('usuario', 'nombre email')
+        .sort('')
+        .populate('usuario')
         .exec((err, servicios) => {
 
             if (err) {
@@ -147,11 +147,11 @@ app.put('/servicio/:id', verificaToken, (req, res) => {
 // ============================
 // Eliminar servicio
 // ============================
-app.delete('/servicio/:id', [verificaToken, verificaAdmin_Role], (req, res) => {
+app.delete('/servicio/:id', verificaToken, (req, res) => {
 
     let id = req.params.id;
 
-    Servicio.findByIdAndRemove(id, (err, servicioDB) => {
+    Servicio.findById(id, (err, servicioDB) => {
 
         if (err) {
             return res.status(500).json({
@@ -169,11 +169,24 @@ app.delete('/servicio/:id', [verificaToken, verificaAdmin_Role], (req, res) => {
             });
         }
 
-        res.json({
-            ok: true,
-            message: 'Servicio borrado'
-        });
+        servicioDB.activo = false;
 
+        servicioDB.save((err, servicioCancelado) => {
+
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    err
+                });
+            }
+
+            res.json({
+                ok: true,
+                producto: servicioCancelado,
+                mensaje: 'Servicio cancelado'
+            });
+
+        })
     });
 
 

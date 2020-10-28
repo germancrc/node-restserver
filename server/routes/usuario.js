@@ -18,7 +18,7 @@ app.get('/usuario', verificaToken,  (req, res) => {
     Usuario.find( {activo: true}, 'nombre apellido cedula direccion numero sector provincia telefono email servicio img google activo' ) // Para hacer busqyedas por parametros. Para filtar los datos a mostrar poner entre apostrofes como string
     .skip(desde)
     .limit(limit)
-    .populate('servicio', 'nombre')
+    .populate('servicio')
     .exec( (err, solicitantes) => {
         if ( err ) {
             return res.status(400).json({
@@ -39,7 +39,7 @@ app.get('/usuario', verificaToken,  (req, res) => {
     });
 });
 
-app.get('/usuario/:id', (req, res) => {
+app.get('/usuario/:id', verificaToken, (req, res) => {
     // populate: usuario categoria
     // paginado
     let id = req.params.id;
@@ -164,12 +164,12 @@ app.delete('/usuario/:id', verificaToken, function (req, res) { // verificaToken
     let id = req.params.id; // obtener el id del registro a eliminar o desactivar
 
     let cambiaEstado = { // para desactivar el registro
-        estado: false
+        activo: false
     }
 
    //  Usuario.findByIdAndRemove(id, ( err, usuarioBorrado ) => { // para borrar el registro fisicamente de la DB
 
-    Usuario.findByIdAndUpdate(id, cambiaEstado, {new: true }, ( err, usuarioBorrado ) => { // para borrar el registro fisicamente de la DB
+    Usuario.findByIdAndUpdate(id, cambiaEstado, {new: true}, ( err, usuarioBorrado ) => { // para borrar el registro fisicamente de la DB
         if ( err ) {
             return res.status(400).json({
                  ok: false,
@@ -191,6 +191,7 @@ app.delete('/usuario/:id', verificaToken, function (req, res) { // verificaToken
          res.json({
              ok: true,
              usuario: usuarioBorrado,
+             message: 'Usuario borrado'
          });
 
     });
